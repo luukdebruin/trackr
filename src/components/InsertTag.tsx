@@ -21,7 +21,7 @@ export default function InsertTag() {
 	const [tagName, setTagName] = useState<string>(null)
 	const [color, setTagColor] = useState<string>(null)
 
-	const updateProfile = async (e) => {
+	const addTag = async (e) => {
 		e.preventDefault()
 
 		const tag: Tag = {
@@ -51,24 +51,20 @@ export default function InsertTag() {
 	}
 
 	return (
-		<div aria-live="polite">
-			{loading ? (
-				'Saving ...'
-			) : (
-				<form onSubmit={updateProfile}>
-					<div>
-						<label htmlFor="tagname">Name</label>
-						<input id="tagname" type="text" value={tagName || ''} onChange={(e) => setTagName(e.target.value)} />
-					</div>
-					<div>
-						<label htmlFor="color">color</label>
-						<input id="color" type="textarea" value={color || ''} onChange={(e) => setTagColor(e.target.value)} />
-					</div>
-					<div>
-						<button disabled={loading}>Add Tag</button>
-					</div>
-				</form>
-			)}
+		<div className="p-4 bg-slate-600 rounded absolute">
+			<div>
+				<label htmlFor="tagname">Name</label>
+				<input id="tagname" type="text" value={tagName || ''} onChange={(e) => setTagName(e.target.value)} />
+			</div>
+			<div>
+				<label htmlFor="color">color</label>
+				<input id="color" type="textarea" value={color || ''} onChange={(e) => setTagColor(e.target.value)} />
+			</div>
+			<div>
+				<button disabled={loading} onClick={(e) => addTag(e)}>
+					Add Tag
+				</button>
+			</div>
 		</div>
 	)
 }

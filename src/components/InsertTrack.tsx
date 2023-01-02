@@ -7,6 +7,7 @@ import { allActionCreators } from 'src/redux'
 import { useAuth } from 'src/contexts/Auth'
 import { supabase } from 'src/database/supabaseClient'
 import { Track } from 'types'
+import TagList from './TagList'
 
 export default function InsertTrack() {
 	const dispatch = useAppDispatch()
@@ -58,33 +59,57 @@ export default function InsertTrack() {
 	}
 
 	return (
-		<div aria-live="polite">
-			{loading ? (
-				'Saving ...'
-			) : (
+		<div className="p-8 bg-slate-300 h-fit rounded-xl flex-1">
+			<>
+				<h2 className="text-xl bold pb-4">New Track</h2>
 				<form onSubmit={updateProfile}>
-					<div>
+					<div className="flex flex-col pb-2">
 						<label htmlFor="trackname">Name</label>
-						<input id="trackname" type="text" value={trackName || ''} onChange={(e) => setTrackName(e.target.value)} />
+						<input
+							id="trackname"
+							type="text"
+							value={trackName || ''}
+							className="appearance-none rounded-md w-full py-2 px-3 mt-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+							placeholder="Name"
+							onChange={(e) => setTrackName(e.target.value)}
+						/>
 					</div>
-					<div>
+					<div className="flex flex-col py-2">
 						<label htmlFor="description">Description</label>
 						<input
 							id="description"
 							type="textarea"
 							value={description || ''}
+							className="appearance-none rounded-md w-full py-2 px-3 mt-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+							placeholder="Description"
 							onChange={(e) => setDescription(e.target.value)}
 						/>
 					</div>
-					<div>
+					<div className="flex flex-col py-2">
 						<label htmlFor="date">Date</label>
-						<DatePicker id="date" selected={date} onChange={(newDate) => setDate(newDate)} />
+						<DatePicker
+							id="date"
+							className="appearance-none rounded-md w-full py-2 px-3 mt-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+							selected={date}
+							onChange={(newDate) => setDate(newDate)}
+						/>
+					</div>
+					<div className="flex flex-col py-2">
+						<label htmlFor="date" className="mb-1">
+							Tag
+						</label>
+						<TagList />
 					</div>
 					<div>
-						<button disabled={loading}>Add Track</button>
+						<button
+							className={`py-2 px-4 mt-4 bg-indigo-500 text-white rounded-md ${loading ? 'opacity-50' : 'opacity-100'}`}
+							disabled={loading}
+						>
+							Add Track
+						</button>
 					</div>
 				</form>
-			)}
+			</>
 		</div>
 	)
 }

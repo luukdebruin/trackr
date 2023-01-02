@@ -1,6 +1,7 @@
 import React from 'react'
 import { Route, Redirect } from 'react-router-dom'
 import { useAuth } from '../contexts/Auth'
+import Header from './Header'
 
 export function PrivateRoute({ component: Component, ...rest }: any) {
 	const { user } = useAuth()
@@ -9,7 +10,14 @@ export function PrivateRoute({ component: Component, ...rest }: any) {
 		<Route
 			{...rest}
 			render={(props) => {
-				return user ? <Component {...props} /> : <Redirect to="/login" />
+				return user ? (
+					<div className="flex flex-row">
+						<Header />
+						<Component {...props} />
+					</div>
+				) : (
+					<Redirect to="/login" />
+				)
 			}}
 		></Route>
 	)

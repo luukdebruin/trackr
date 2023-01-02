@@ -41,7 +41,7 @@ export default function TrackList() {
 	}
 
 	return (
-		<div aria-live="polite">
+		<div className="ml-4 p-8 bg-slate-300 h-fit rounded-xl flex-[2_2_0%]">
 			{loading
 				? 'Loading ...'
 				: tracks.map((track: Track) => {
