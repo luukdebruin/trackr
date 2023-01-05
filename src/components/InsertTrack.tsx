@@ -11,14 +11,16 @@ import TagList from './TagList'
 
 export default function InsertTrack() {
 	const dispatch = useAppDispatch()
-	const { updateTracks, setActiveTag } = bindActionCreators(
+	const { updateTracks, setActiveTag, toggleInsertTrackModel } = bindActionCreators(
 		{
 			updateTracks: allActionCreators.updateTracks,
 			setActiveTag: allActionCreators.setActiveTag,
+			toggleInsertTrackModel: allActionCreators.toggleInsertTrackModel,
 		},
 		dispatch,
 	)
 	const activeTag = useAppSelector((state) => state.app.activeTag)
+	const insertTrackModel = useAppSelector((state) => state.app.insertTrackModel)
 
 	const { user } = useAuth()
 	const [loading, setLoading] = useState<boolean>(false)
@@ -55,61 +57,64 @@ export default function InsertTrack() {
 			setLoading(false)
 			updateTracks(track)
 			setActiveTag(undefined)
+			toggleInsertTrackModel(false)
 		}
 	}
 
+	if (!insertTrackModel) {
+		return
+	}
+
 	return (
-		<div className="p-8 bg-slate-300 h-fit rounded-xl flex-1">
-			<>
-				<h2 className="text-xl bold pb-4">New Track</h2>
-				<form onSubmit={updateProfile}>
-					<div className="flex flex-col pb-2">
-						<label htmlFor="trackname">Name</label>
-						<input
-							id="trackname"
-							type="text"
-							value={trackName || ''}
-							className="appearance-none rounded-md w-full py-2 px-3 mt-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-							placeholder="Name"
-							onChange={(e) => setTrackName(e.target.value)}
-						/>
-					</div>
-					<div className="flex flex-col py-2">
-						<label htmlFor="description">Description</label>
-						<input
-							id="description"
-							type="textarea"
-							value={description || ''}
-							className="appearance-none rounded-md w-full py-2 px-3 mt-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-							placeholder="Description"
-							onChange={(e) => setDescription(e.target.value)}
-						/>
-					</div>
-					<div className="flex flex-col py-2">
-						<label htmlFor="date">Date</label>
-						<DatePicker
-							id="date"
-							className="appearance-none rounded-md w-full py-2 px-3 mt-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-							selected={date}
-							onChange={(newDate) => setDate(newDate)}
-						/>
-					</div>
-					<div className="flex flex-col py-2">
-						<label htmlFor="date" className="mb-1">
-							Tag
-						</label>
-						<TagList />
-					</div>
-					<div>
-						<button
-							className={`py-2 px-4 mt-4 bg-indigo-500 text-white rounded-md ${loading ? 'opacity-50' : 'opacity-100'}`}
-							disabled={loading}
-						>
-							Add Track
-						</button>
-					</div>
-				</form>
-			</>
+		<div className="p-8 bg-slate-300 h-fit rounded-xl absolute">
+			<h2 className="text-xl bold pb-4">New Track</h2>
+			<form onSubmit={updateProfile}>
+				<div className="flex flex-col pb-2">
+					<label htmlFor="trackname">Name</label>
+					<input
+						id="trackname"
+						type="text"
+						value={trackName || ''}
+						className="appearance-none rounded-md w-full py-2 px-3 mt-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						placeholder="Name"
+						onChange={(e) => setTrackName(e.target.value)}
+					/>
+				</div>
+				<div className="flex flex-col py-2">
+					<label htmlFor="description">Description</label>
+					<input
+						id="description"
+						type="textarea"
+						value={description || ''}
+						className="appearance-none rounded-md w-full py-2 px-3 mt-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						placeholder="Description"
+						onChange={(e) => setDescription(e.target.value)}
+					/>
+				</div>
+				<div className="flex flex-col py-2">
+					<label htmlFor="date">Date</label>
+					<DatePicker
+						id="date"
+						className="appearance-none rounded-md w-full py-2 px-3 mt-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						selected={date}
+						onChange={(newDate) => setDate(newDate)}
+					/>
+				</div>
+				<div className="flex flex-col py-2">
+					<label htmlFor="date" className="mb-1">
+						Tag
+					</label>
+					<TagList />
+				</div>
+				<div>
+					<button
+						className={`py-2 px-4 mt-4 bg-indigo-500 text-white rounded-md ${loading ? 'opacity-50' : 'opacity-100'}`}
+						disabled={loading}
+					>
+						Add Track
+					</button>
+				</div>
+			</form>
 		</div>
 	)
 }

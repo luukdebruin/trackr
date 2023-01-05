@@ -1,29 +1,54 @@
+import { User } from '@supabase/supabase-js'
 import { Action, Middleware, MiddlewareAPI, Dispatch } from 'redux'
+import { supabase } from 'src/database/supabaseClient'
 import { Tag, Tags, Track, Tracks } from 'types'
-import { RootState } from './index'
+import { allActionCreators, RootState } from './index'
+import store from './store'
 
 export interface AppState {
 	tracks: Tracks
 	tags: Tags
 	activeTag: Tag
+	user: User
+	insertTrackModel: boolean
 }
 
 const initialState: AppState = {
 	tracks: [],
 	tags: [],
 	activeTag: undefined,
+	user: undefined,
+	insertTrackModel: false,
 }
 
 export enum AppTypeKeys {
-	FETCH_TRACKS = 'FETCH_TRACKS',
+	LOGIN = 'LOGIN',
+	LOGOUT = 'LOGOUT',
+	LOGIN_SUCCESS = 'LOGIN_SUCCESS',
+	SET_TRACKS = 'SET_TRACKS',
 	UPDATE_TRACKS = 'UPDATE_TRACKS',
-	FETCH_TAGS = 'FETCH_TAGS',
+	SET_TAGS = 'SET_TAGS',
 	UPDATE_TAGS = 'UPDATE_TAGS',
 	SET_ACTIVE_TAG = 'SET_ACTIVE_TAG',
+	TOGGLE_INSERT_TRACK_MODEL = 'TOGGLE_INSERT_TRACK_MODEL',
 }
 
-export interface FetchTracksAction extends Action {
-	type: AppTypeKeys.FETCH_TRACKS
+export interface LoginAction extends Action {
+	type: AppTypeKeys.LOGIN
+	user: User
+}
+
+export interface LogoutAction extends Action {
+	type: AppTypeKeys.LOGOUT
+}
+
+export interface LoginSuccessAction extends Action {
+	type: AppTypeKeys.LOGIN_SUCCESS
+	user: User
+}
+
+export interface SetTracksAction extends Action {
+	type: AppTypeKeys.SET_TRACKS
 	tracks: Tracks
 }
 
@@ -32,8 +57,8 @@ export interface UpdateTracksAction extends Action {
 	track: Track
 }
 
-export interface FetchTagsAction extends Action {
-	type: AppTypeKeys.FETCH_TAGS
+export interface SetTagsAction extends Action {
+	type: AppTypeKeys.SET_TAGS
 	tags: Tags
 }
 
@@ -47,12 +72,43 @@ export interface SetActiveTag extends Action {
 	tag: Tag
 }
 
-export type AppActionTypes = UpdateTracksAction | FetchTracksAction | FetchTagsAction | UpdateTagsAction | SetActiveTag
+export interface ToggleInsertTrackModel extends Action {
+	type: AppTypeKeys.TOGGLE_INSERT_TRACK_MODEL
+	insertTrackModel: boolean
+}
+
+export type AppActionTypes =
+	| LoginAction
+	| LogoutAction
+	| LoginSuccessAction
+	| SetTracksAction
+	| UpdateTracksAction
+	| SetTagsAction
+	| UpdateTagsAction
+	| SetActiveTag
+	| ToggleInsertTrackModel
 
 export const appActionCreators = {
-	fetchTracks(tracks: Tracks): FetchTracksAction {
+	login(user: User): LoginAction {
 		return {
-			type: AppTypeKeys.FETCH_TRACKS,
+			type: AppTypeKeys.LOGIN,
+			user,
+		}
+	},
+	logout(): LogoutAction {
+		return {
+			type: AppTypeKeys.LOGOUT,
+		}
+	},
+	loginSuccess(user: User): LoginSuccessAction {
+		return {
+			type: AppTypeKeys.LOGIN_SUCCESS,
+			user,
+		}
+	},
+	setTracks(tracks: Tracks): SetTracksAction {
+		return {
+			type: AppTypeKeys.SET_TRACKS,
 			tracks,
 		}
 	},
@@ -62,9 +118,9 @@ export const appActionCreators = {
 			track,
 		}
 	},
-	fetchTags(tags: Tags): FetchTagsAction {
+	setTags(tags: Tags): SetTagsAction {
 		return {
-			type: AppTypeKeys.FETCH_TAGS,
+			type: AppTypeKeys.SET_TAGS,
 			tags,
 		}
 	},
@@ -80,13 +136,36 @@ export const appActionCreators = {
 			tag,
 		}
 	},
+	toggleInsertTrackModel(insertTrackModel: boolean): ToggleInsertTrackModel {
+		return {
+			type: AppTypeKeys.TOGGLE_INSERT_TRACK_MODEL,
+			insertTrackModel,
+		}
+	},
 }
 
 export type AppActionCreators = typeof appActionCreators
 
 export default function AppReducer(state = initialState, action: AppActionTypes) {
 	switch (action.type) {
-		case AppTypeKeys.FETCH_TRACKS:
+		case AppTypeKeys.LOGIN:
+			return {
+				...state,
+				user: action.user,
+			}
+		case AppTypeKeys.LOGOUT:
+			return {
+				...state,
+				tracks: [],
+				tags: [],
+				activeTag: undefined,
+				user: undefined,
+			}
+		case AppTypeKeys.LOGIN_SUCCESS:
+			return {
+				...state,
+			}
+		case AppTypeKeys.SET_TRACKS:
 			return {
 				...state,
 				tracks: action.tracks,
@@ -96,7 +175,7 @@ export default function AppReducer(state = initialState, action: AppActionTypes)
 				...state,
 				tracks: [...state.tracks, action.track],
 			}
-		case AppTypeKeys.FETCH_TAGS:
+		case AppTypeKeys.SET_TAGS:
 			return {
 				...state,
 				tags: action.tags,
@@ -111,6 +190,11 @@ export default function AppReducer(state = initialState, action: AppActionTypes)
 				...state,
 				activeTag: action.tag,
 			}
+		case AppTypeKeys.TOGGLE_INSERT_TRACK_MODEL:
+			return {
+				...state,
+				insertTrackModel: action.insertTrackModel,
+			}
 		default:
 			return state
 	}
@@ -118,11 +202,38 @@ export default function AppReducer(state = initialState, action: AppActionTypes)
 
 export function AppMiddleware(): Middleware {
 	return (_: MiddlewareAPI<Dispatch, RootState>) => (next) => async (action: any) => {
-		// const prevState = store.getState()
 		next(action)
-		// const state = store.getState()
-		// switch (action.type) {
+		const state = store.getState()
+		switch (action.type) {
+			case AppTypeKeys.LOGIN: {
+				store.dispatch(allActionCreators.loginSuccess(action.user))
+				return
+			}
+			case AppTypeKeys.LOGIN_SUCCESS: {
+				try {
+					const { data, error } = await supabase.from('tracks').select().eq('user_id', action.user.id)
+					store.dispatch(allActionCreators.setTracks(data))
+					if (error) {
+						throw error
+					}
+				} catch (error) {
+					alert(error.message)
+				}
+				try {
+					const { data, error } = await supabase.from('tags').select().eq('user_id', action.user.id)
+					store.dispatch(allActionCreators.setTags(data))
 
-		// }
+					if (error) {
+						throw error
+					}
+				} catch (error) {
+					alert(error.message)
+				}
+				return
+			}
+			case AppTypeKeys.UPDATE_TRACKS: {
+				store.dispatch(allActionCreators.setTracks(state.app.tracks))
+			}
+		}
 	}
 }

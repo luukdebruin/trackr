@@ -20,7 +20,7 @@
 		"baseUrl": ".",
 		"typeRoots": [
 			"./node_modules/@types",
-      "./environment.d.ts"
+      "./environment.d.ts",
 		],
   },
   "exclude": [

@@ -1,12 +1,12 @@
 import React from 'react'
+import Heatmap from './Heatmap'
 import InsertTrack from './InsertTrack'
-import TrackList from './TrackList'
 
 export default function Dashboard() {
 	return (
-		<div className="w-full flex p-4">
+		<div className="w-full h-screen p-4 overflow-hidden relative">
 			<InsertTrack />
-			<TrackList />
+			<Heatmap />
 		</div>
 	)
 }

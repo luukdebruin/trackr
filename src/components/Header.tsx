@@ -2,12 +2,24 @@ import React from 'react'
 import { useHistory } from 'react-router'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/Auth'
-import { BiWindow, BiUser, BiWrench, BiLogOut } from 'react-icons/bi'
+import { ImQuotesLeft, ImCog } from 'react-icons/im'
+import { IoLogOut, IoAddOutline } from 'react-icons/io5'
+import { useAppDispatch, useAppSelector } from 'src/redux/hooks'
+import { bindActionCreators } from 'redux'
+import { allActionCreators } from 'src/redux'
 
 export default function Header() {
 	const { signOut } = useAuth()
 	const history = useHistory()
 	const location = useLocation()
+	const dispatch = useAppDispatch()
+	const { toggleInsertTrackModel } = bindActionCreators(
+		{
+			toggleInsertTrackModel: allActionCreators.toggleInsertTrackModel,
+		},
+		dispatch,
+	)
+	const insertTrackModel = useAppSelector((state) => state.app.insertTrackModel)
 
 	async function handleSignOut() {
 		await signOut()
@@ -17,17 +29,12 @@ export default function Header() {
 	const navigation = [
 		{
 			name: 'Home',
-			icon: <BiWindow size={24} />,
+			icon: <ImQuotesLeft size={24} />,
 			link: '/',
 		},
 		{
-			name: 'Profile',
-			icon: <BiUser size={24} />,
-			link: '/profile',
-		},
-		{
 			name: 'Settings',
-			icon: <BiWrench size={24} />,
+			icon: <ImCog size={24} />,
 			link: '/settings',
 		},
 	]
@@ -35,23 +42,34 @@ export default function Header() {
 	return (
 		<div className="h-screen p-2 py-4 flex flex-col justify-between w-full flex-1 bg-slate-200">
 			<div>
-				{navigation.map((item: any) => {
-					return (
-						<Link
-							to={item.link}
-							key={item.name}
-							className={`flex p-2 mb-2 rounded-md hover:bg-slate-300 ${
-								location.pathname === item.link ? 'bg-slate-300' : ''
-							}`}
-						>
-							<span>{item.icon}</span>
-						</Link>
-					)
-				})}
+				<div
+					className="flex p-2 rounded-md hover:bg-slate-300 cursor-pointer"
+					onClick={() => toggleInsertTrackModel(!insertTrackModel)}
+				>
+					<span>
+						<IoAddOutline size={24} />
+					</span>
+				</div>
+				<div className="h-[1px] bg-slate-400 my-2"></div>
+				<div>
+					{navigation.map((item: any) => {
+						return (
+							<Link
+								to={item.link}
+								key={item.name}
+								className={`flex p-2 mb-2 rounded-md hover:bg-slate-300 ${
+									location.pathname === item.link ? 'bg-slate-300' : ''
+								}`}
+							>
+								<span>{item.icon}</span>
+							</Link>
+						)
+					})}
+				</div>
 			</div>
-			<div className="flex p-2 rounded-md hover:bg-slate-300" onClick={handleSignOut}>
+			<div className="flex p-2 rounded-md hover:bg-slate-300 cursor-pointer" onClick={handleSignOut}>
 				<span>
-					<BiLogOut size={24} />
+					<IoLogOut size={24} />
 				</span>
 			</div>
 		</div>

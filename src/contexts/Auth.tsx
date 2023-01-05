@@ -1,5 +1,8 @@
 import { AuthError, AuthResponse, User } from '@supabase/supabase-js'
 import React, { useContext, useState, useEffect } from 'react'
+import { bindActionCreators } from 'redux'
+import { allActionCreators } from 'src/redux'
+import { useAppDispatch } from 'src/redux/hooks'
 import { supabase } from '../database/supabaseClient'
 
 interface AuthContextInterface {
@@ -12,6 +15,14 @@ interface AuthContextInterface {
 const AuthContext = React.createContext<AuthContextInterface | null>(null)
 
 export function AuthProvider({ children }: any) {
+	const dispatch = useAppDispatch()
+	const { login, logout } = bindActionCreators(
+		{
+			login: allActionCreators.login,
+			logout: allActionCreators.logout,
+		},
+		dispatch,
+	)
 	const [user, setUser] = useState<User>()
 	const [loading, setLoading] = useState<boolean>(true)
 
@@ -22,8 +33,15 @@ export function AuthProvider({ children }: any) {
 		})
 
 		const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
-			setUser((session?.user as any) ?? null)
 			setLoading(false)
+			if (event == 'SIGNED_IN') {
+				setUser(session.user)
+				login(session.user)
+			}
+			if (event == 'SIGNED_OUT') {
+				setUser(undefined)
+				logout()
+			}
 		})
 
 		return () => {
