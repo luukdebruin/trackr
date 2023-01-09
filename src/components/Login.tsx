@@ -25,21 +25,39 @@ export default function Login() {
 	}
 
 	return (
-		<div>
-			<form onSubmit={handleSubmit}>
-				<label htmlFor="input-email">Email</label>
-				<input id="input-email" type="email" ref={emailRef} />
+		<div className="w-full h-full flex justify-center items-center">
+			<div className="p-8 bg-slate-300 h-fit min-w-[400px] rounded-xl">
+				<form onSubmit={handleSubmit}>
+					<div className="flex flex-col pb-2">
+						<label htmlFor="input-email">Email</label>
+						<input
+							id="input-email"
+							type="email"
+							ref={emailRef}
+							className="appearance-none rounded-md w-full py-2 px-3 mt-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						/>
+					</div>
 
-				<label htmlFor="input-password">Password</label>
-				<input id="input-password" type="password" ref={passwordRef} />
-
-				<br />
-
-				<button type="submit">Login</button>
-			</form>
-			<p>
-				Don&apos;t have an account? <Link to="/signup">Sign Up</Link>
-			</p>
+					<div className="flex flex-col py-2">
+						<label htmlFor="input-password">Password</label>
+						<input
+							id="input-password"
+							type="password"
+							ref={passwordRef}
+							className="appearance-none rounded-md w-full py-2 px-3 mt-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						/>
+					</div>
+					<div>
+						<button className="py-2 px-4 mt-4 bg-indigo-500 text-white rounded-md">Login</button>
+					</div>
+				</form>
+				<p className="pt-4">
+					Don&apos;t have an account?{' '}
+					<Link to="/signup" className="underline text-blue-600">
+						Sign Up
+					</Link>
+				</p>
+			</div>
 		</div>
 	)
 }

@@ -11,6 +11,7 @@ export interface AppState {
 	activeTag: Tag
 	user: User
 	insertTrackModel: boolean
+	tagCategories: Tags
 }
 
 const initialState: AppState = {
@@ -19,6 +20,7 @@ const initialState: AppState = {
 	activeTag: undefined,
 	user: undefined,
 	insertTrackModel: false,
+	tagCategories: [],
 }
 
 export enum AppTypeKeys {
@@ -31,6 +33,7 @@ export enum AppTypeKeys {
 	UPDATE_TAGS = 'UPDATE_TAGS',
 	SET_ACTIVE_TAG = 'SET_ACTIVE_TAG',
 	TOGGLE_INSERT_TRACK_MODEL = 'TOGGLE_INSERT_TRACK_MODEL',
+	SET_TAG_CATEGORIES = 'SET_TAG_CATEGORIES',
 }
 
 export interface LoginAction extends Action {
@@ -77,6 +80,11 @@ export interface ToggleInsertTrackModel extends Action {
 	insertTrackModel: boolean
 }
 
+export interface SetTagCategories extends Action {
+	type: AppTypeKeys.SET_TAG_CATEGORIES
+	tagCategories: Tags
+}
+
 export type AppActionTypes =
 	| LoginAction
 	| LogoutAction
@@ -87,6 +95,7 @@ export type AppActionTypes =
 	| UpdateTagsAction
 	| SetActiveTag
 	| ToggleInsertTrackModel
+	| SetTagCategories
 
 export const appActionCreators = {
 	login(user: User): LoginAction {
@@ -142,6 +151,12 @@ export const appActionCreators = {
 			insertTrackModel,
 		}
 	},
+	setTagCategories(tagCategories: Tags): SetTagCategories {
+		return {
+			type: AppTypeKeys.SET_TAG_CATEGORIES,
+			tagCategories,
+		}
+	},
 }
 
 export type AppActionCreators = typeof appActionCreators
@@ -160,6 +175,8 @@ export default function AppReducer(state = initialState, action: AppActionTypes)
 				tags: [],
 				activeTag: undefined,
 				user: undefined,
+				insertTrackModel: false,
+				tagCategories: [],
 			}
 		case AppTypeKeys.LOGIN_SUCCESS:
 			return {
@@ -195,6 +212,11 @@ export default function AppReducer(state = initialState, action: AppActionTypes)
 				...state,
 				insertTrackModel: action.insertTrackModel,
 			}
+		case AppTypeKeys.SET_TAG_CATEGORIES:
+			return {
+				...state,
+				tagCategories: action.tagCategories,
+			}
 		default:
 			return state
 	}
@@ -222,6 +244,7 @@ export function AppMiddleware(): Middleware {
 				try {
 					const { data, error } = await supabase.from('tags').select().eq('user_id', action.user.id)
 					store.dispatch(allActionCreators.setTags(data))
+					store.dispatch(allActionCreators.setTagCategories(data))
 
 					if (error) {
 						throw error

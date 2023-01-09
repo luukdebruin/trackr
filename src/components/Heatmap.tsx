@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
+import { AiOutlinePlus, AiOutlineMinus } from 'react-icons/ai'
 import { useAppSelector } from 'src/redux/hooks'
+import { Track } from 'types'
 import HeatmapDay from './HeatmapDay'
+import TagFilter from './TagFilter'
 
 export default function Heatmap() {
 	const tracks = useAppSelector((state) => state.app.tracks)
@@ -16,7 +19,7 @@ export default function Heatmap() {
 		let key = 1
 		while (loop <= endDate) {
 			const loopDate = loop.toISOString().split('T')[0]
-			const filteredTracks = tracks.filter((track) => {
+			const filteredTracks = tracks.filter((track: Track) => {
 				return track.date.toLocaleString() === loop.toISOString().split('T')[0]
 			})
 			days.push(<HeatmapDay key={key} date={loop} tracks={filteredTracks} today={loopDate === today} />)
@@ -29,11 +32,20 @@ export default function Heatmap() {
 
 	return (
 		<div className="flex flex-col w-full">
-			<div>
-				<span className="mr-4" onClick={() => setGridSize(gridSize + 1)}>
-					minus
-				</span>
-				<span onClick={() => setGridSize(gridSize - 1)}>plus</span>
+			<div className="w-full pb-4 pt-2 flex flex-row justify-between">
+				<TagFilter />
+				<div className="flex">
+					<AiOutlineMinus
+						className="mr-4 p-2 bg-indigo-200 rounded text-slate-600 hover:bg-indigo-400 hover:text-slate-200 cursor-pointer"
+						onClick={() => setGridSize(gridSize + 1)}
+						size={30}
+					/>
+					<AiOutlinePlus
+						className="p-2 bg-indigo-200 rounded text-slate-600 hover:bg-indigo-400 hover:text-slate-200 cursor-pointer"
+						onClick={() => setGridSize(gridSize - 1)}
+						size={30}
+					/>
+				</div>
 			</div>
 			<div
 				className="w-full grid gap-4 auto-rows-max overflow-scroll"
