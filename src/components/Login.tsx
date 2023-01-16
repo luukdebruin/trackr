@@ -1,13 +1,22 @@
 import React, { useRef } from 'react'
 import { Link, useHistory } from 'react-router-dom'
 import { useAuth } from '../contexts/Auth'
+import { useAppDispatch } from 'src/redux/hooks'
+import { bindActionCreators } from 'redux'
+import { allActionCreators } from 'src/redux'
 
 export default function Login() {
 	const emailRef = useRef<HTMLInputElement>()
 	const passwordRef = useRef<HTMLInputElement>()
 	const { signIn } = useAuth()
-
 	const history = useHistory()
+	const dispatch = useAppDispatch()
+	const { login } = bindActionCreators(
+		{
+			login: allActionCreators.login,
+		},
+		dispatch,
+	)
 
 	async function handleSubmit(e) {
 		e.preventDefault()
@@ -15,12 +24,13 @@ export default function Login() {
 		const email = emailRef.current.value
 		const password = passwordRef.current.value
 
-		const { error } = await signIn({ email, password })
+		const { data, error } = await signIn({ email, password })
 
 		if (error) {
 			alert('error signing in')
 		} else {
 			history.push('/')
+			login(data.session.user)
 		}
 	}
 

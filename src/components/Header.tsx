@@ -13,8 +13,9 @@ export default function Header() {
 	const history = useHistory()
 	const location = useLocation()
 	const dispatch = useAppDispatch()
-	const { toggleInsertTrackModel } = bindActionCreators(
+	const { logout, toggleInsertTrackModel } = bindActionCreators(
 		{
+			logout: allActionCreators.logout,
 			toggleInsertTrackModel: allActionCreators.toggleInsertTrackModel,
 		},
 		dispatch,
@@ -24,6 +25,7 @@ export default function Header() {
 	async function handleSignOut() {
 		await signOut()
 		history.push('/login')
+		logout()
 	}
 
 	const navigation = [
@@ -43,12 +45,10 @@ export default function Header() {
 		<div className="h-screen p-2 py-4 flex flex-col justify-between w-full flex-1 bg-slate-200">
 			<div>
 				<div
-					className="flex p-2 rounded-md hover:bg-slate-300 cursor-pointer"
+					className="flex p-2 rounded-md hover:bg-slate-300 cursor-pointer ease-in-out duration-200"
 					onClick={() => toggleInsertTrackModel(!insertTrackModel)}
 				>
-					<span>
-						<IoAddOutline size={24} />
-					</span>
+					<IoAddOutline size={24} />
 				</div>
 				<div className="h-[1px] bg-slate-400 my-2"></div>
 				<div>
@@ -57,7 +57,7 @@ export default function Header() {
 							<Link
 								to={item.link}
 								key={item.name}
-								className={`flex p-2 mb-2 rounded-md hover:bg-slate-300 ${
+								className={`flex p-2 mb-2 rounded-md hover:bg-slate-300 ease-in-out duration-200 ${
 									location.pathname === item.link ? 'bg-slate-300' : ''
 								}`}
 							>
@@ -67,7 +67,10 @@ export default function Header() {
 					})}
 				</div>
 			</div>
-			<div className="flex p-2 rounded-md hover:bg-slate-300 cursor-pointer" onClick={handleSignOut}>
+			<div
+				className="flex p-2 rounded-md hover:bg-slate-300 cursor-pointer ease-in-out duration-200"
+				onClick={handleSignOut}
+			>
 				<span>
 					<IoLogOut size={24} />
 				</span>

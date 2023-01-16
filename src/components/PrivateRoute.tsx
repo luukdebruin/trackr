@@ -11,7 +11,7 @@ export function PrivateRoute({ component: Component, ...rest }: any) {
 			{...rest}
 			render={(props) => {
 				return user ? (
-					<div className="flex flex-row">
+					<div className="flex flex-row overflow-hidden">
 						<Header />
 						<Component {...props} />
 					</div>

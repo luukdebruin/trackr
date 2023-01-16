@@ -19,3 +19,12 @@ export interface Tag {
 }
 
 export type Tags = Tag[]
+
+export interface Day {
+	key: number
+	date: Date
+	tracks: Tracks
+	isToday: boolean
+}
+
+export type Days = Day[]
